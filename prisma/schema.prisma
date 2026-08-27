@@ -1,0 +1,85 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model College {
+  id                 String     @id @default(cuid())
+  slug               String     @unique
+  name               String
+  shortName          String
+  location           String
+  city               String
+  state              String
+  establishedYear    Int
+  type               String     // Public, Private, Deemed
+  nirfRank           Int
+  rating             Float
+  reviewCount        Int        @default(0)
+  tuitionFeeMinLakhs Float
+  tuitionFeeMaxLakhs Float
+  avgPackageLpa      Float
+  highestPackageLpa  Float
+  logoUrl            String
+  bannerUrl          String
+  overview           String
+  accreditation      String
+  campusSizeAcres    Int
+  hostelFeePerYear   Int
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  courses            Course[]
+  placementStats     PlacementStat[]
+  cutoffs            Cutoff[]
+  reviews            Review[]
+}
+
+model Course {
+  id              String   @id @default(cuid())
+  collegeId       String
+  college         College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  name            String
+  degree          String
+  durationYears   Int
+  totalFee        Int
+  seats           Int
+  specializations String   // Stored as comma separated string or JSON
+}
+
+model PlacementStat {
+  id                String   @id @default(cuid())
+  collegeId         String
+  college           College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  year              Int
+  placementRate     Float
+  avgPackageLpa     Float
+  highestPackageLpa Float
+  topRecruiters     String   // Stored as JSON or comma-separated string
+}
+
+model Cutoff {
+  id          String   @id @default(cuid())
+  collegeId   String
+  college     College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  exam        String
+  branch      String
+  category    String
+  openingRank Int
+  closingRank Int
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  collegeId String
+  college   College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  userName  String
+  userRole  String
+  rating    Float
+  comment   String
+  createdAt DateTime @default(now())
+}
